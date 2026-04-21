@@ -1,34 +1,72 @@
-﻿using BlackBarberAPI.DTOs;
+﻿using AutoMapper;
+using BlackBarberAPI.DTOs;
+using BlackBarberAPI.Models;
 using BlackBarberAPI.Services.Contratos;
 using Microsoft.EntityFrameworkCore;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace BlackBarberAPI.Services
 {
     public class BarberoService<T> : IBarberoService<T> where T : DbContext
     {
-        public Task<BarberoDTO> CrearYObtener(BarberoDTO objeto)
+        private readonly IGenericRepository<Barbero, T> _repositorio;
+        private readonly IMapper _Mapper;
+
+        public BarberoService(IGenericRepository<Barbero, T> repositorio, IMapper mapper)
         {
-            throw new NotImplementedException();
+            _repositorio = repositorio;
+            _Mapper = mapper;
         }
 
-        public Task<RespuestaDTO> Editar(BarberoDTO objeto)
+        public async Task<BarberoDTO> CrearYObtener(BarberoDTO objeto)
         {
-            throw new NotImplementedException();
+            var modelo = _Mapper.Map<Barbero>(objeto);
+            var objetoCreado = await _repositorio.Crear(modelo);
+            return _Mapper.Map<BarberoDTO>(objetoCreado);
         }
 
-        public Task<RespuestaDTO> Eliminar(int id)
+        public async Task<RespuestaDTO> Editar(BarberoDTO objeto)
         {
-            throw new NotImplementedException();
+            RespuestaDTO respuesta = new RespuestaDTO();
+            var objetoEncontrado = await _repositorio.Obtener(b=>b.Id == objeto.Id);
+            if(objetoEncontrado == null || objetoEncontrado.Id <= 0)
+            {
+                respuesta.Estatus = false;
+                respuesta.Descripcion = "No se encontró el barbero.";
+                return respuesta;
+            }
+            objetoEncontrado.Nombre = objeto.Nombre;
+            objetoEncontrado.Estatus = objeto.Estatus;
+            respuesta.Estatus = await _repositorio.Editar(objetoEncontrado);
+            respuesta.Descripcion = respuesta.Estatus ? "Barbero editado exitosamente." : "Ocurrió un problema al intentar editar el barbero.";
+            return respuesta;
         }
 
-        public Task<List<BarberoDTO>> ObtenerTodos()
+        public async Task<RespuestaDTO> Eliminar(int id)
         {
-            throw new NotImplementedException();
+            RespuestaDTO respuesta = new RespuestaDTO();
+            var objetoEncontrado = await _repositorio.Obtener(b => b.Id == id);
+            if (objetoEncontrado == null || objetoEncontrado.Id <= 0)
+            {
+                respuesta.Estatus = false;
+                respuesta.Descripcion = "No se encontró el barbero.";
+                return respuesta;
+            }
+            respuesta.Estatus = await _repositorio.Eliminar(objetoEncontrado);
+            respuesta.Descripcion = respuesta.Estatus ? "Barbero eliminado exitosamente." : "Ocurrió un problema al intentar eliminar el barbero.";
+            return respuesta;
         }
 
-        public Task<BarberoDTO> ObtenerXId(int id)
+        public async Task<List<BarberoDTO>> ObtenerTodos()
         {
-            throw new NotImplementedException();
+            var lista = await _repositorio.ObtenerTodos();
+            return _Mapper.Map<List<BarberoDTO>>(lista);
+        }
+
+        public async Task<BarberoDTO> ObtenerXId(int id)
+        {
+            var respuesta = await _repositorio.Obtener(b=>b.Id == id);
+            return _Mapper.Map<BarberoDTO>(respuesta);
         }
     }
 }
