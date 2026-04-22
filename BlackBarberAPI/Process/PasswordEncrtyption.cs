@@ -9,12 +9,12 @@
             _configuration = configuration;
         }
 
-        public static string Encrypt(string password)
+        public string Encrypt(string password)
         {
             return password;
         }
 
-        public static string Decrypt(string hash)
+        public string Decrypt(string hash)
         {
             return hash;
         }

@@ -7,6 +7,7 @@ namespace BlackBarberAPI.Services.Contratos
     {
         Task<List<UsuarioDTO>> ObtenerTodos();
         Task<UsuarioDTO> ObtenerXId(int id);
+        Task<UsuarioDTO> ObtenerXCorreo(string correo);
         Task<UsuarioDTO> CrearYObtener(UsuarioDTO objeto);
         Task<RespuestaDTO> Editar(UsuarioDTO objeto);
     }

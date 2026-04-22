@@ -1,4 +1,7 @@
-﻿using BlackBarberAPI.DTOs;
+﻿using AutoMapper;
+using BlackBarberAPI.Data;
+using BlackBarberAPI.DTOs;
+using BlackBarberAPI.Models;
 using BlackBarberAPI.Services.Contratos;
 using Microsoft.EntityFrameworkCore;
 
@@ -6,29 +9,53 @@ namespace BlackBarberAPI.Services
 {
     public class RolService<T> : IRolService<T> where T : DbContext
     {
-        public Task<RolDTO> CrearYObtener(RolDTO objeto)
+        private readonly IGenericRepository<Rol, BlackBarberContext> _repository;
+        private readonly IMapper _mapper;
+
+        public RolService(IGenericRepository<Rol, BlackBarberContext> repository, IMapper mapper)
         {
-            throw new NotImplementedException();
+            _repository = repository; _mapper = mapper;
         }
 
-        public Task<RespuestaDTO> Editar(RolDTO objeto)
+        public async Task<List<RolDTO>> ObtenerTodos() => _mapper.Map<List<RolDTO>>(await _repository.ObtenerTodos());
+        public async Task<RolDTO> ObtenerXId(int id) => _mapper.Map<RolDTO>(await _repository.Obtener(r => r.Id == id));
+        public async Task<RolDTO> CrearYObtener(RolDTO objeto) => _mapper.Map<RolDTO>(await _repository.Crear(_mapper.Map<Rol>(objeto)));
+        public async Task<RespuestaDTO> Editar(RolDTO objeto)
         {
-            throw new NotImplementedException();
+            RespuestaDTO respuesta = new RespuestaDTO();
+            var objetoEncontrado = await _repository.Obtener(r => r.Id == objeto.Id);
+
+            if (objetoEncontrado == null || objetoEncontrado.Id <= 0)
+            {
+                respuesta.Estatus = false;
+                respuesta.Descripcion = "No se encontró el rol";
+                return respuesta;
+            }
+
+            _mapper.Map(objeto, objetoEncontrado);
+
+            respuesta.Estatus = await _repository.Editar(objetoEncontrado);
+            respuesta.Descripcion = respuesta.Estatus ? "Rol actualizado" : "Error al actualizar";
+
+            return respuesta;
         }
 
-        public Task<RespuestaDTO> Eliminar(int id)
+        public async Task<RespuestaDTO> Eliminar(int id)
         {
-            throw new NotImplementedException();
-        }
+            RespuestaDTO respuesta = new RespuestaDTO();
+            var objetoEncontrado = await _repository.Obtener(r => r.Id == id);
 
-        public Task<List<RolDTO>> ObtenerTodos()
-        {
-            throw new NotImplementedException();
-        }
+            if (objetoEncontrado == null || objetoEncontrado.Id <= 0)
+            {
+                respuesta.Estatus = false;
+                respuesta.Descripcion = "No se encontró el rol";
+                return respuesta;
+            }
 
-        public Task<RolDTO> ObtenerXId(int id)
-        {
-            throw new NotImplementedException();
+            respuesta.Estatus = await _repository.Eliminar(objetoEncontrado);
+            respuesta.Descripcion = respuesta.Estatus ? "Rol eliminado" : "Error al eliminar";
+
+            return respuesta;
         }
     }
 }

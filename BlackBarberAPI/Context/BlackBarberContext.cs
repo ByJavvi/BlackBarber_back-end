@@ -44,9 +44,6 @@ public partial class BlackBarberContext : DbContext
 
     public virtual DbSet<Usuario> Usuarios { get; set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseSqlServer("Server=JAVVI;User Id=sa;password=L1ve_and_l3arn;DataBase=BlackBarber;TrustServerCertificate=True;");
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<AnadidoServicio>(entity =>

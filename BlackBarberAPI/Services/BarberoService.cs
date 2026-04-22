@@ -3,7 +3,6 @@ using BlackBarberAPI.DTOs;
 using BlackBarberAPI.Models;
 using BlackBarberAPI.Services.Contratos;
 using Microsoft.EntityFrameworkCore;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace BlackBarberAPI.Services
 {
@@ -67,6 +66,12 @@ namespace BlackBarberAPI.Services
         {
             var respuesta = await _repositorio.Obtener(b=>b.Id == id);
             return _Mapper.Map<BarberoDTO>(respuesta);
+        }
+
+        public async Task<BarberoDTO> ObtenerXIdUsuario(int idUsuario)
+        {
+            var barberoObtenido = await _repositorio.Obtener(b=>b.IdUsuario == idUsuario);
+            return _Mapper.Map<BarberoDTO>(barberoObtenido);
         }
     }
 }

@@ -1,4 +1,7 @@
-﻿using BlackBarberAPI.DTOs;
+﻿using AutoMapper;
+using BlackBarberAPI.Data;
+using BlackBarberAPI.DTOs;
+using BlackBarberAPI.Models;
 using BlackBarberAPI.Services.Contratos;
 using Microsoft.EntityFrameworkCore;
 
@@ -6,34 +9,63 @@ namespace BlackBarberAPI.Services
 {
     public class ResenaService<T> : IResenaService<T> where T : DbContext
     {
-        public Task<ResenaDTO> CrearYObtener(ResenaDTO objeto)
+        private readonly IGenericRepository<Resena, BlackBarberContext> _repository;
+        private readonly IMapper _mapper;
+
+        public ResenaService(IGenericRepository<Resena, BlackBarberContext> repository, IMapper mapper)
         {
-            throw new NotImplementedException();
+            _repository = repository;
+            _mapper = mapper;
         }
 
-        public Task<RespuestaDTO> Editar(ResenaDTO objeto)
+        public async Task<List<ResenaDTO>> ObtenerTodos() => _mapper.Map<List<ResenaDTO>>(await _repository.ObtenerTodos());
+
+        public async Task<List<ResenaDTO>> ObtenerXPerteneciente(int idPerteneciente)
         {
-            throw new NotImplementedException();
+            var lista = await _repository.ObtenerTodos(r => r.IdCita == idPerteneciente);
+            return _mapper.Map<List<ResenaDTO>>(lista);
         }
 
-        public Task<RespuestaDTO> Eliminar(int id)
+        public async Task<ResenaDTO> ObtenerXId(int id) => _mapper.Map<ResenaDTO>(await _repository.Obtener(r => r.Id == id));
+
+        public async Task<ResenaDTO> CrearYObtener(ResenaDTO objeto) => _mapper.Map<ResenaDTO>(await _repository.Crear(_mapper.Map<Resena>(objeto)));
+
+        public async Task<RespuestaDTO> Editar(ResenaDTO objeto)
         {
-            throw new NotImplementedException();
+            RespuestaDTO respuesta = new RespuestaDTO();
+            var objetoEncontrado = await _repository.Obtener(r => r.Id == objeto.Id);
+
+            if (objetoEncontrado == null || objetoEncontrado.Id <= 0)
+            {
+                respuesta.Estatus = false;
+                respuesta.Descripcion = "No se encontró la reseña";
+                return respuesta;
+            }
+
+            _mapper.Map(objeto, objetoEncontrado);
+
+            respuesta.Estatus = await _repository.Editar(objetoEncontrado);
+            respuesta.Descripcion = respuesta.Estatus ? "Reseña actualizada" : "Error al actualizar";
+
+            return respuesta;
         }
 
-        public Task<List<ResenaDTO>> ObtenerTodos()
+        public async Task<RespuestaDTO> Eliminar(int id)
         {
-            throw new NotImplementedException();
-        }
+            RespuestaDTO respuesta = new RespuestaDTO();
+            var objetoEncontrado = await _repository.Obtener(r => r.Id == id);
 
-        public Task<ResenaDTO> ObtenerXId(int idPerteneciente)
-        {
-            throw new NotImplementedException();
-        }
+            if (objetoEncontrado == null || objetoEncontrado.Id <= 0)
+            {
+                respuesta.Estatus = false;
+                respuesta.Descripcion = "No se encontró la reseña";
+                return respuesta;
+            }
 
-        public Task<List<ResenaDTO>> ObtenerXPerteneciente(int idPerteneciente)
-        {
-            throw new NotImplementedException();
+            respuesta.Estatus = await _repository.Eliminar(objetoEncontrado);
+            respuesta.Descripcion = respuesta.Estatus ? "Reseña eliminada" : "Error al eliminar";
+
+            return respuesta;
         }
     }
 }
