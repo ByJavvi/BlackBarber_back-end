@@ -27,7 +27,7 @@ namespace BlackBarberAPI.Services
         public async Task<UsuarioDTO> ObtenerXId(int id)
         {
             var modelo = await _repository.Obtener(u => u.Id == id);
-            return (modelo.Id != 0) ? _mapper.Map<UsuarioDTO>(modelo) : null;
+            return (modelo.Id != 0) ? _mapper.Map<UsuarioDTO>(modelo) : new UsuarioDTO();
         }
 
         public async Task<UsuarioDTO> Login(string correo, string password)
@@ -87,6 +87,12 @@ namespace BlackBarberAPI.Services
                 Estatus = eliminado,
                 Descripcion = eliminado ? "Usuario eliminado" : "Error al eliminar"
             };
+        }
+
+        public async Task<UsuarioDTO> ObtenerXCorreo(string correo)
+        {
+            var modelo = await _repository.Obtener(u => u.Correo == correo);
+            return (modelo.Id != 0) ? _mapper.Map<UsuarioDTO>(modelo) : new UsuarioDTO();
         }
     }
 }

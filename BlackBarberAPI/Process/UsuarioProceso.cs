@@ -1,10 +1,12 @@
 ﻿using BlackBarberAPI.Data;
 using BlackBarberAPI.DTOs;
 using BlackBarberAPI.Services.Contratos;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace BlackBarberAPI.Process
 {
@@ -56,6 +58,7 @@ namespace BlackBarberAPI.Process
                 return respuesta;
             }
             usuario.Estatus = 1;
+            usuario.IdRol = 2;
             //usuario.HoraCreacion = DateTime.Now;
             usuario.PasswordHash = _passwordEncryption.Encrypt(usuario.PasswordHash);
             UsuarioDTO resultado = await _usuarioService.CrearYObtener(usuario);
@@ -124,7 +127,7 @@ namespace BlackBarberAPI.Process
                 respuesta.Token = "El usuario está inactivo.";
                 return respuesta;
             }
-            var contrasenaDesencriptada = _passwordEncryption.Decrypt(credenciales.Email);
+            var contrasenaDesencriptada = _passwordEncryption.Decrypt(credenciales.Contrasena);
             if (contrasenaDesencriptada != credenciales.Contrasena)
             {
                 respuesta.Estatus = false;
@@ -153,7 +156,7 @@ namespace BlackBarberAPI.Process
                 return respuesta;
             }
             var barbero = await _barberoService.ObtenerXIdUsuario(usuario.Id);
-            if (barbero != null)
+            if (barbero != null && barbero.Id>0)
             {
                 zvClaims.Add(new Claim("role", "Barbero"));
             }
@@ -171,6 +174,63 @@ namespace BlackBarberAPI.Process
             var zvToken = new JwtSecurityToken(issuer: null, audience: null, claims: zvClaims, expires: zvExpiracion, signingCredentials: zvCreds);
             respuesta.Token = new JwtSecurityTokenHandler().WriteToken(zvToken);
             respuesta.Estatus = true;
+            return respuesta;
+        }
+
+        public async Task<RespuestaAutenticacionDTO> ConstruirTokenRecuperacion(UsuarioDTO usuario)
+        {
+            RespuestaAutenticacionDTO respuesta = new RespuestaAutenticacionDTO();
+            var zvClaims = new List<Claim>()
+            {
+                new Claim("email", usuario.Correo),
+            };
+            var zvLlave = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["llavejwt"]!));
+            var zvCreds = new SigningCredentials(zvLlave, SecurityAlgorithms.HmacSha256);
+            var zvExpiracion = DateTime.UtcNow.AddHours(2);
+            var zvToken = new JwtSecurityToken(issuer: null, audience: null, claims: zvClaims, expires: zvExpiracion, signingCredentials: zvCreds);
+            respuesta.Token = new JwtSecurityTokenHandler().WriteToken(zvToken);
+            respuesta.Estatus = true;
+            return respuesta;
+        }
+
+        public async Task<RespuestaDTO> RestablecerContrasena(RestablecerContrasenaDTO objeto)
+        {
+            RespuestaDTO respuesta = new RespuestaDTO();
+            if (string.IsNullOrWhiteSpace(objeto.Correo) || string.IsNullOrWhiteSpace(objeto.Token))
+            {
+                respuesta.Estatus = false;
+                respuesta.Descripcion = "Email y token son requeridos.";
+                return respuesta;
+            }
+
+            if (string.IsNullOrWhiteSpace(objeto.Contrasena))
+            {
+                respuesta.Estatus = false;
+                respuesta.Descripcion = "La contraseña es requerida.";
+                return respuesta;
+            }
+
+            var usuario = await _usuarioService.ObtenerXCorreo(objeto.Correo);
+            if (usuario == null || usuario.Id<=0)
+            {
+                respuesta.Estatus = false;
+                respuesta.Descripcion = "Usuario no encontrado";
+                return respuesta;
+            }
+
+            string decodedToken;
+            try
+            {
+                var tokenBytes = WebEncoders.Base64UrlDecode(objeto.Token);
+                decodedToken = Encoding.UTF8.GetString(tokenBytes);
+            }
+            catch
+            {
+                respuesta.Estatus = false;
+                respuesta.Descripcion = "Token inválido o expirado.";
+                return respuesta;
+            }
+            //Work in progress...
             return respuesta;
         }
     }

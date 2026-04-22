@@ -29,6 +29,14 @@ namespace BlackBarberAPI.Utilidades
 
             #endregion
 
+            #region Rol
+
+            CreateMap<Rol, RolDTO>();
+            CreateMap<RolDTO, Rol>()
+                .ForMember(destino => destino.Usuarios, opt => opt.Ignore());
+
+            #endregion
+
         }
     }
 }
