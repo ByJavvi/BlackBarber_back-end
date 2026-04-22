@@ -56,7 +56,7 @@ namespace BlackBarberAPI.Process
                 return respuesta;
             }
             usuario.Estatus = 1;
-            usuario.HoraCreacion = DateTime.Now;
+            //usuario.HoraCreacion = DateTime.Now;
             usuario.PasswordHash = _passwordEncryption.Encrypt(usuario.PasswordHash);
             UsuarioDTO resultado = await _usuarioService.CrearYObtener(usuario);
             respuesta.Estatus = resultado.Id > 0;

@@ -3,7 +3,6 @@ using BlackBarberAPI.DTOs;
 using BlackBarberAPI.Models;
 using BlackBarberAPI.Services.Contratos;
 using Microsoft.EntityFrameworkCore;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace BlackBarberAPI.Services
 {

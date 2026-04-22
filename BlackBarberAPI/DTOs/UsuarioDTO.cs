@@ -10,7 +10,7 @@
 
         public string? PasswordHash { get; set; }
 
-        public DateTime HoraCreacion { get; set; }
+        public byte[] HoraCreacion { get; set; } = null!;
 
         public int? Estatus { get; set; }
 
