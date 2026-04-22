@@ -59,9 +59,10 @@ namespace BlackBarberAPI.Services
 
             if (objetoEncontrado.Id <= 0)
                 return new RespuestaDTO { Estatus = false, Descripcion = "Usuario no encontrado" };
-
-            // AutoMapper actualiza solo las propiedades que coinciden entre DTO y Modelo
-            _mapper.Map(objeto, objetoEncontrado);
+            objetoEncontrado.Estatus = objeto.Estatus;
+            objetoEncontrado.IdRol = objeto.IdRol;
+            objetoEncontrado.PasswordHash = objeto.PasswordHash;
+            var modelo = _mapper.Map<Usuario>(objetoEncontrado);
 
             bool actualizado = await _repository.Editar(objetoEncontrado);
 
