@@ -71,5 +71,11 @@ namespace BlackBarberAPI.Services
             respuesta.Descripcion = respuesta.Estatus ? "Cita elimiada" : "Error al eliminar";
             return respuesta;
         }
+
+        public async Task<List<CitaDTO>> ObtenerCitasVigentes()
+        {
+            var lista = await _repository.ObtenerTodos(c => c.FechaTermino > DateTime.Now);
+            return _mapper.Map<List<CitaDTO>>(lista);
         }
+    }
 }
