@@ -23,14 +23,14 @@ namespace BlackBarberAPI.Controllers
         }
 
         [HttpPost("crearUsuario")]
-        public async Task<ActionResult<RespuestaDTO>> CrearUsuario([FromBody] UsuarioDTO usuario)
+        public async Task<ActionResult<RespuestaDTO>> CrearUsuario([FromBody] UsuarioCreacionDTO usuario)
         {
             var resultado = await _proceso.CrearUsuario(usuario);
             return resultado;
         }
 
         [HttpPost("editarUsuario")]
-        public async Task<ActionResult<RespuestaDTO>> EditarUsuario([FromBody] UsuarioDTO usuario)
+        public async Task<ActionResult<RespuestaDTO>> EditarUsuario([FromBody] UsuarioEdicionDTO usuario)
         {
             var resultado = await _proceso.EditarUsuario(usuario);
             return resultado;

@@ -1,22 +1,24 @@
-﻿namespace BlackBarberAPI.Process
+﻿using BCrypt.Net;
+namespace BlackBarberAPI.Process
 {
     public class PasswordEncrtyption
     {
-        private readonly IConfiguration _configuration;
 
-        public PasswordEncrtyption(IConfiguration configuration)
+        public PasswordEncrtyption()
         {
-            _configuration = configuration;
         }
 
-        public string Encrypt(string password)
+        public string HashPassword(string password)
         {
-            return password;
+            // BCrypt genera automáticamente un 'Salt' y lo incluye en el string resultante
+            return BCrypt.Net.BCrypt.EnhancedHashPassword(password, workFactor: 12);
         }
 
-        public string Decrypt(string hash)
+        // Este método se usa en el LOGIN
+        public bool VerifyPassword(string passwordPlano, string passwordHash)
         {
-            return hash;
+            // Compara el texto plano con el hash guardado en la BD
+            return BCrypt.Net.BCrypt.EnhancedVerify(passwordPlano, passwordHash);
         }
     }
 }

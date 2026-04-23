@@ -32,11 +32,11 @@ namespace BlackBarberAPI.Process
             _configuration = configuration;
         }
 
-        public async Task<RespuestaDTO> CrearUsuario(UsuarioDTO usuario)
+        public async Task<RespuestaDTO> CrearUsuario(UsuarioCreacionDTO usuario)
         {
             RespuestaDTO respuesta = new RespuestaDTO();
             var usuarios = await _usuarioService.ObtenerTodos();
-            if (string.IsNullOrWhiteSpace(usuario.PasswordHash))
+            if (string.IsNullOrWhiteSpace(usuario.Contrasena))
             {
                 respuesta.Estatus = false;
                 respuesta.Descripcion = "Los datos no pueden ir vacíos.";
@@ -57,19 +57,32 @@ namespace BlackBarberAPI.Process
                 respuesta.Descripcion = "Ya existe un usuario con ese correo electrónico";
                 return respuesta;
             }
-            usuario.Estatus = 1;
-            usuario.IdRol = 2;
+            UsuarioDTO usuarioCrear = new UsuarioDTO
+            {
+                Id = 0,
+                Username = usuario.Username,
+                Correo = usuario.Correo,
+                Estatus = 1,
+                IdRol = 2,
+            };
             //usuario.HoraCreacion = DateTime.Now;
-            usuario.PasswordHash = _passwordEncryption.Encrypt(usuario.PasswordHash);
-            UsuarioDTO resultado = await _usuarioService.CrearYObtener(usuario);
+            usuarioCrear.PasswordHash = _passwordEncryption.HashPassword(usuario.Contrasena);
+            UsuarioDTO resultado = await _usuarioService.CrearYObtener(usuarioCrear);
             respuesta.Estatus = resultado.Id > 0;
             respuesta.Descripcion = respuesta.Estatus ? "Usuario creado exitosamente." : "Ocurrió un error al intentar editar el usuario.";
             return respuesta;
         }
 
-        public async Task<RespuestaDTO> EditarUsuario(UsuarioDTO usuario)
+        public async Task<RespuestaDTO> EditarUsuario(UsuarioEdicionDTO objeto)
         {
             RespuestaDTO respuesta = new RespuestaDTO();
+            UsuarioDTO usuario = new UsuarioDTO
+            {
+                Id = objeto.Id,
+                Username = objeto.Username,
+                Correo = objeto.Correo,
+                Estatus = objeto.Estatus,
+            };
             var barberoAsociado = await _barberoService.ObtenerXIdUsuario(usuario.Id);
             if (barberoAsociado != null)
             {
@@ -114,7 +127,7 @@ namespace BlackBarberAPI.Process
                 return respuesta;
             }
             var usuarios = await _usuarioService.ObtenerTodos();
-            var usuario = usuarios.Where(u => u.Correo == credenciales.Email).First();
+            var usuario = usuarios.Where(u => u.Correo == credenciales.Email).FirstOrDefault();
             if (usuario==null)
             {
                 respuesta.Estatus = false;
@@ -127,8 +140,8 @@ namespace BlackBarberAPI.Process
                 respuesta.Token = "El usuario está inactivo.";
                 return respuesta;
             }
-            var contrasenaDesencriptada = _passwordEncryption.Decrypt(credenciales.Contrasena);
-            if (contrasenaDesencriptada != credenciales.Contrasena)
+            var contrasenaCorrecta = _passwordEncryption.VerifyPassword(credenciales.Contrasena, usuario.PasswordHash);
+            if (!contrasenaCorrecta)
             {
                 respuesta.Estatus = false;
                 respuesta.Token = "La contraseña es incorrecta.";
