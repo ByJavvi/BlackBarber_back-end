@@ -15,6 +15,6 @@
 
     public class CitaCreacionDTO : CitaDTO
     {
-        public List<ServicioDTO> servicios { get; set; } = new List<ServicioDTO>();
+        public List<ServicioCitaDTO> servicios { get; set; } = new List<ServicioCitaDTO>();
     }
 }
