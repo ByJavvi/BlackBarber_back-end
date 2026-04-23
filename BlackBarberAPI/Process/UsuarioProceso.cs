@@ -173,7 +173,7 @@ namespace BlackBarberAPI.Process
             {
                 zvClaims.Add(new Claim("role", "Barbero"));
             }
-            else if (rol.Descripcion == "Administrador")
+            else if (rol.Nombre == "Administrador")
             {
                 zvClaims.Add(new Claim("role", "Administrador"));
             }
