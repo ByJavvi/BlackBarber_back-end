@@ -6,6 +6,8 @@
 
         public int? IdServicioCita { get; set; }
 
+        public int? IdAnadidoServicion {  get; set; }
+
         public decimal Precio { get; set; }
     }
 }

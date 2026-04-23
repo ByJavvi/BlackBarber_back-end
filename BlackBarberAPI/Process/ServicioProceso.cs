@@ -47,6 +47,7 @@ namespace BlackBarberAPI.Process
             RespuestaDTO respuesta = new RespuestaDTO();
             ServicioDTO servicio = new ServicioDTO
             {
+                Id = objeto.Id,
                 Nombre = objeto.Nombre,
                 Descripcion = objeto.Descripcion,
                 IdTipo = objeto.IdTipo,
