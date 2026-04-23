@@ -42,7 +42,9 @@ namespace BlackBarberAPI.Services
                 return respuesta;
             }
 
-            _mapper.Map(objeto, objetoEncontrado);
+            objetoEncontrado.Descripcion = objeto.Descripcion;
+            objetoEncontrado.FechaInicio = objeto.FechaInicio;
+            objetoEncontrado.FechaFin = objeto.FechaFin;
 
             respuesta.Estatus = await _repository.Editar(objetoEncontrado);
             respuesta.Descripcion = respuesta.Estatus ? "Promoción actualizada" : "Error al actualizar la promoción";

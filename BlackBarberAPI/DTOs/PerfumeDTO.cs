@@ -12,4 +12,9 @@
 
         public bool? Disponible { get; set; }
     }
+
+    public class PerfumeConArchivoDTO : PerfumeDTO
+    {
+        public IFormFile? Archivo { get; set; }
+    }
 }

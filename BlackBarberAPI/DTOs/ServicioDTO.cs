@@ -16,4 +16,14 @@
 
         public int? Estatus { get; set; }
     }
+
+    public class ServicioListadoDTO : ServicioDTO
+    {
+        public string TipoServicio { get; set; } = "";
+    }
+
+    public class ServicioConArchivoDTO : ServicioDTO
+    {
+        public IFormFile? Archivo { get; set; }
+    }
 }

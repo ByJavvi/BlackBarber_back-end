@@ -36,8 +36,8 @@ namespace BlackBarberAPI.Controllers
             return respuesta;
         }
 
-        [HttpPost("eliminarBarbero")]
-        public async Task<ActionResult<RespuestaDTO>> EliminarBarbero([FromBody] int id)
+        [HttpGet("eliminarBarbero/{id:int}")]
+        public async Task<ActionResult<RespuestaDTO>> EliminarBarbero(int id)
         {
             var respuesta = await _proceso.EliminarBarbero(id);
             return respuesta;
