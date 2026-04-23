@@ -16,4 +16,18 @@
 
         public int? IdRol { get; set; }
     }
+
+    public class UsuarioCreacionDTO
+    {
+        public string Username { get; set; } = "";
+        public string Correo { get; set; } = "";
+        public string Contrasena { get; set; } = "";
+    }
+
+    public class UsuarioEdicionDTO : UsuarioCreacionDTO
+    {
+        public int Id { get; set; }
+        public int Estatus { get; set; }
+
+    }
 }
