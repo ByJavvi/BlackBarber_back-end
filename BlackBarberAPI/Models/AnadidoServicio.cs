@@ -16,4 +16,5 @@ public partial class AnadidoServicio
     public decimal Precio { get; set; }
 
     public virtual Servicio? IdPertenecienteNavigation { get; set; }
+    public virtual ICollection<DetalleCitum> DetalleCitas { get; set; } = new List<DetalleCitum>();
 }

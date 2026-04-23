@@ -12,4 +12,9 @@
 
         public int? Estatus { get; set; }
     }
+
+    public class CitaCreacionDTO : CitaDTO
+    {
+        public List<ServicioDTO> servicios { get; set; } = new List<ServicioDTO>();
+    }
 }

@@ -72,6 +72,20 @@ namespace BlackBarberAPI.Utilidades
 
             #endregion
 
+            #region Consulta
+
+            CreateMap<Consultas, ConsultaDTO>();
+            CreateMap<ConsultaDTO, Consultas>();
+
+            #endregion
+
+            #region DiasHabiles
+
+            CreateMap<DiasHabiles, DiasHabilDTO>();
+            CreateMap<DiasHabilDTO, DiasHabiles>();
+
+            #endregion
+
         }
     }
 }

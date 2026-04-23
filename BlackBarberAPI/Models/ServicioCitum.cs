@@ -13,9 +13,12 @@ public partial class ServicioCitum
 
     public decimal Precio { get; set; }
 
+    public int? IdBarbero { get; set; }
+
     public virtual ICollection<DetalleCitum> DetalleCita { get; set; } = new List<DetalleCitum>();
 
     public virtual Citum? IdCitaNavigation { get; set; }
 
     public virtual Servicio? IdServicioNavigation { get; set; }
+    public virtual Barbero? IdBarberoNavigation { get; set; }
 }

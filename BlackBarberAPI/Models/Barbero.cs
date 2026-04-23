@@ -14,6 +14,7 @@ public partial class Barbero
     public int? Estatus { get; set; }
 
     public virtual ICollection<BarberoServicio> BarberoServicios { get; set; } = new List<BarberoServicio>();
+    public virtual ICollection<ServicioCitum> ServiciosCitas { get; set; } = new List<ServicioCitum>();
 
     public virtual Usuario? IdUsuarioNavigation { get; set; }
 }

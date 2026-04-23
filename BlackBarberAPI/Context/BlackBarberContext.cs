@@ -44,6 +44,10 @@ public partial class BlackBarberContext : DbContext
 
     public virtual DbSet<Usuario> Usuarios { get; set; }
 
+    public virtual DbSet<Consultas> Consultas { get; set; }
+
+    public virtual DbSet<DiasHabiles> DiasHabiles { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<AnadidoServicio>(entity =>
@@ -242,6 +246,22 @@ public partial class BlackBarberContext : DbContext
             entity.HasOne(d => d.IdRolNavigation).WithMany(p => p.Usuarios)
                 .HasForeignKey(d => d.IdRol)
                 .HasConstraintName("FK_Usuario_Rol");
+        });
+
+        modelBuilder.Entity<Consultas>(entity =>
+        {
+            entity.Property(e => e.Estatus).HasDefaultValue(1);
+            entity.Property(e => e.Nombre).HasMaxLength(80);
+            entity.Property(e => e.Correo).HasMaxLength(200);
+            entity.Property(e => e.Mensaje).HasMaxLength(450);
+        });
+
+        modelBuilder.Entity<DiasHabiles>(entity =>
+        {
+            entity.Property(e => e.Habil).HasDefaultValue(true);
+            entity.Property(e => e.Nombre).HasMaxLength(100);
+            entity.Property(e => e.HoraInicio).HasColumnType("time");
+            entity.Property(e => e.HoraFin).HasColumnType("time");
         });
 
         OnModelCreatingPartial(modelBuilder);
