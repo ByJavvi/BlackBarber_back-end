@@ -49,4 +49,5 @@ namespace BlackBarberAPI.Controllers
             var respuesta = await _proceso.AsignarPerfilBarbero(asignacion);
             return respuesta;
         }
+    }
 }

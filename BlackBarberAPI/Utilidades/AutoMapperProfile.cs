@@ -37,6 +37,41 @@ namespace BlackBarberAPI.Utilidades
 
             #endregion
 
+            #region Cita
+
+            CreateMap<Citum, CitaDTO>();
+            CreateMap<CitaDTO, Citum>()
+                .ForMember(destino => destino.Resenas, opt => opt.Ignore())
+                .ForMember(destino => destino.IdClienteNavigation, opt => opt.Ignore())
+                .ForMember(destino => destino.ServicioCita, opt => opt.Ignore());
+
+            #endregion
+
+            #region Perfume
+
+            CreateMap<Perfume, PerfumeDTO>();
+            CreateMap<PerfumeDTO, Perfume>()
+                .ForMember(destino => destino.PreferenciasClientes, opt => opt.Ignore());
+
+            #endregion
+
+            #region Promocion
+
+            CreateMap<Promocion, PromocionDTO>();
+            CreateMap<PromocionDTO, Promocion>();
+
+            #endregion
+
+            #region Servicio
+
+            CreateMap<Servicio, ServicioDTO>();
+            CreateMap<ServicioDTO, Servicio>()
+                .ForMember(destino => destino.BarberoServicios, opt => opt.Ignore())
+                .ForMember(destino => destino.ServicioCita, opt => opt.Ignore())
+                .ForMember(destino => destino.IdTipoNavigation, opt => opt.Ignore());
+
+            #endregion
+
         }
     }
 }

@@ -31,11 +31,15 @@ namespace BlackBarberAPI.Utilidades
 
             #region Procesos
 
-            services.AddScoped(typeof(UsuarioProceso));
-            services.AddScoped(typeof(PasswordEncrtyption));
             services.AddScoped(typeof(BarberoProceso));
+            services.AddScoped(typeof(CitaProceso));
+            services.AddScoped(typeof(DashboardProceso));
+            services.AddScoped(typeof(PasswordEncrtyption));
             services.AddScoped(typeof(PerfumeProceso));
             services.AddScoped(typeof(PromocionProceso));
+            services.AddScoped(typeof(ServicioProceso));
+            services.AddScoped(typeof(UsuarioProceso));
+
 
             #endregion
 
