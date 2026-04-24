@@ -20,8 +20,7 @@ namespace BlackBarberAPI.Services
 
         public async Task<List<ServicioDTO>> ObtenerTodos()
         {
-            // Filtramos por estatus activo (1) para que no aparezcan servicios deshabilitados
-            var lista = await _repository.ObtenerTodos(s => s.Estatus == 1);
+            var lista = await _repository.ObtenerTodos();
             return _mapper.Map<List<ServicioDTO>>(lista);
         }
 

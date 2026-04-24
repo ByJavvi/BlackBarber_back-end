@@ -24,10 +24,13 @@ namespace BlackBarberAPI.Controllers
         }
 
         [HttpPost("crearConsulta")]
-        public async Task<ActionResult<ConsultaDTO>> CrearConsulta(ConsultaDTO consultaDTO)
+        public async Task<ActionResult<RespuestaDTO>> CrearConsulta(ConsultaDTO consultaDTO)
         {
+            RespuestaDTO respuesta = new RespuestaDTO();
             var resultado = await _service.CrearConsulta(consultaDTO);
-            return resultado;
+            respuesta.Estatus = resultado.Id > 0;
+            respuesta.Descripcion = respuesta.Estatus ? "Consulta enviada exitosamente" : "Ocurrió un error al intentar subir la consulta";
+            return respuesta;
         }
 
         [HttpPost("editarConsulta")]

@@ -20,7 +20,7 @@ namespace BlackBarberAPI.Services
 
         public async Task<List<PerfumeDTO>> ObtenerTodos()
         {
-            var lista = await _repository.ObtenerTodos(p => p.Disponible == true);
+            var lista = await _repository.ObtenerTodos();
             return _mapper.Map<List<PerfumeDTO>>(lista);
         }
 

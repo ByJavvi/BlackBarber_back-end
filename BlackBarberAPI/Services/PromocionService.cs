@@ -20,8 +20,6 @@ namespace BlackBarberAPI.Services
 
         public async Task<List<PromocionDTO>> ObtenerTodos()
         {
-            // Solo promociones vigentes
-            var hoy = DateTime.Now.Date;
             var lista = await _repository.ObtenerTodos();
             return _mapper.Map<List<PromocionDTO>>(lista);
         }
