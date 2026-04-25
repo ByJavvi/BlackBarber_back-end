@@ -88,6 +88,7 @@ namespace BlackBarberAPI.Process
                 }
                 foreach (var servicio in citaCreacionDTO.Servicios)
                 {
+                    var servicioObjeto = await _servicioService.ObtenerXId(servicio.Id);
                     var disponibilidad = await ObtenerDisponibilidad(cita.FechaInicio, cita.FechaTermino, (int)servicio.IdBarbero);
                     if (!disponibilidad.Estatus)
                     {
@@ -98,7 +99,8 @@ namespace BlackBarberAPI.Process
                     {
                         IdCita = citaCreada.Id,
                         IdServicio = servicio.IdServicio,
-                        IdBarbero = servicio.IdBarbero
+                        IdBarbero = servicio.IdBarbero,
+                        Precio = servicioObjeto.PrecioBase
                     };
                     var servicioAgregado = await _servicioCita_service.CrearYObtener(servicioCita);
                     if (servicioAgregado.Id <= 0)
