@@ -1,4 +1,6 @@
-﻿using BlackBarberAPI.DTOs;
+﻿using BlackBarberAPI.Data;
+using BlackBarberAPI.DTOs;
+using BlackBarberAPI.Services.Contratos;
 
 namespace BlackBarberAPI.Process
 {
@@ -7,12 +9,14 @@ namespace BlackBarberAPI.Process
         private readonly BarberoProceso _barberoProceso;
         private readonly ServicioProceso _servicioProceso;
         private readonly CitaProceso _citaProceso;
+        private readonly IServicioCitaService<BlackBarberContext> _servicioCitaService;
 
-        public DashboardProceso(BarberoProceso barberoProceso, ServicioProceso servicioProceso, CitaProceso citaProceso)
+        public DashboardProceso(BarberoProceso barberoProceso, ServicioProceso servicioProceso, CitaProceso citaProceso, IServicioCitaService<BlackBarberContext> servicioCitaService)
         {
             _barberoProceso = barberoProceso;
             _servicioProceso = servicioProceso;
             _citaProceso = citaProceso;
+            _servicioCitaService = servicioCitaService;
         }
 
         public async Task<DashboardAdminDTO> ObtenerDashboardAdmin()
@@ -30,6 +34,29 @@ namespace BlackBarberAPI.Process
                 countExtras += anadidos.Count();
             }
             dashboard.ExtrasServicios = countExtras;
+            var citas = await _citaProceso.ObtenerCitasHoy();
+            var citasAyer = await _citaProceso.ObtenerCitasAyer();
+            var diferencia = citas.Count() - citasAyer.Count();
+            if(diferencia == 0 || citasAyer.Count() == 0)
+            {
+                dashboard.PorcentajeCitas = 0;
+            }
+            else
+            {
+                dashboard.PorcentajeCitas = (diferencia / citasAyer.Count()) * 100;
+            }
+            dashboard.CitasDeldia = citas.Count();
+            decimal sumaIngresos = 0;
+            foreach(var cita in citas)
+            {
+                var detallesCita = await _servicioCitaService.ObtenerXPerteneciente(cita.Id);
+                foreach (var detalle in detallesCita)
+                {
+                    sumaIngresos += detalle.Precio;
+                }
+            }
+            dashboard.IngresosDeldia = sumaIngresos;
+            dashboard.PorcentajeXTicket = citas.Count()>0 ? sumaIngresos / citas.Count() : 0;
             //Falta objtener la información de las citas del día, ingresos y porcentajes
             return dashboard;
         }

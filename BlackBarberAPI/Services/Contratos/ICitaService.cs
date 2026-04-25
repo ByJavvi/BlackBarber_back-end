@@ -7,6 +7,8 @@ namespace BlackBarberAPI.Services.Contratos
     {
         Task<List<CitaDTO>> ObtenerTodas();
         Task<List<CitaDTO>> ObtenerCitasVigentes();
+        Task<List<CitaDTO>> ObtenerCitasHoy();
+        Task<List<CitaDTO>> ObtenerCitasAyer();
         Task<CitaDTO> ObtenerXId(int id);
         Task<CitaDTO> CrearYObtener(CitaDTO objeto);
         Task<RespuestaDTO> Editar(CitaDTO objeto);

@@ -77,5 +77,23 @@ namespace BlackBarberAPI.Services
             var lista = await _repository.ObtenerTodos(c => c.FechaTermino > DateTime.Now);
             return _mapper.Map<List<CitaDTO>>(lista);
         }
+
+        public async Task<List<CitaDTO>> ObtenerCitasHoy()
+        {
+            var fechaHoy = DateTime.Today;
+            var finHoy = fechaHoy.AddDays(1).AddTicks(-1);
+
+            var citas = await _repository.ObtenerTodos(c => c.FechaInicio >= fechaHoy && c.FechaTermino <= finHoy);
+            return _mapper.Map<List<CitaDTO>>(citas);
+        }
+
+        public async Task<List<CitaDTO>> ObtenerCitasAyer()
+        {
+            var fechaHoy = DateTime.Today.AddDays(-1);
+            var finHoy = fechaHoy.AddDays(1).AddTicks(-1);
+
+            var citas = await _repository.ObtenerTodos(c => c.FechaInicio >= fechaHoy && c.FechaTermino <= finHoy);
+            return _mapper.Map<List<CitaDTO>>(citas);
+        }
     }
 }

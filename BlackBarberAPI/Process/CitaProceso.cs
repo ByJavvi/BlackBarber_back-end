@@ -149,5 +149,16 @@ namespace BlackBarberAPI.Process
             }
             return lista;
         }
+
+        public async Task<List<CitaDTO>> ObtenerCitasHoy()
+        {
+            var citas = await _citaService.ObtenerCitasHoy();
+            return citas;
+        }
+        public async Task<List<CitaDTO>> ObtenerCitasAyer()
+        {
+            var citas = await _citaService.ObtenerCitasAyer();
+            return citas;
+        }
     }
 }

@@ -21,5 +21,12 @@ namespace BlackBarberAPI.Controllers
             var resultado = await _proceso.ObtenerDashboardAdmin();
             return resultado;
         }
+
+        [HttpGet("dashboardBarbero/{idBarbero:int}")]
+        public async Task<ActionResult<DashboardBarberoDTO>> ObtenerDashboardBarbero(int idBarbero)
+        {
+            var resultado = await _proceso.ObtenerDashboardBarbero(idBarbero);
+            return resultado;
+        }
     }
 }
