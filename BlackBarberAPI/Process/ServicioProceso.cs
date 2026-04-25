@@ -112,5 +112,10 @@ namespace BlackBarberAPI.Process
                 return fullBase64ForFront;
             }
         }
+
+        public Task<ServicioDTO> ObtenerXId(int id)
+        {
+            return _servicioService.ObtenerXId(id);
+        }
     }
 }

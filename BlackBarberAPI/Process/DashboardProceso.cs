@@ -82,6 +82,26 @@ namespace BlackBarberAPI.Process
             DashboardClienteDTO dashboard = new DashboardClienteDTO();
             var citas = await _citaProceso.ObtenerCitasXCliente(IdCliente);
             dashboard.Reservas = citas.Count();
+            var citasProximaSemana = citas.Where(c => c.FechaInicio.Date >= DateTime.Now.Date && c.FechaInicio.Date <= DateTime.Now.AddDays(7).Date).ToList();
+            dashboard.DetalleReservas = $"{citasProximaSemana.Count()} para esta semana";
+            var idsServicios = new List<int>();
+            var idsBarberos = new List<int>();
+            foreach (var cita in citas)
+            {
+                var detallesCita = await _servicioCitaService.ObtenerXPerteneciente(cita.Id);
+                foreach (var detalle in detallesCita)
+                {
+                    if(detalle.IdServicio!=null && !idsServicios.Contains((int)detalle.IdServicio))
+                    idsServicios.Add((int)detalle.IdServicio);
+                    if (detalle.IdBarbero != null && !idsBarberos.Contains((int)detalle.IdBarbero))
+                    idsBarberos.Add((int) detalle.IdBarbero);
+                }
+            }
+            dashboard.ServiciosFavoritos = idsServicios.Count();
+            var servicio = await _servicioProceso.ObtenerXId(idsServicios.FirstOrDefault());
+            dashboard.DetalleServiciosFavoritos = servicio!= null? servicio.Nombre : "";
+            dashboard.BarberosSugeridos = idsBarberos.Count();
+            //Falta  obtener la disponibiliodad
             return dashboard;
         }
     }
