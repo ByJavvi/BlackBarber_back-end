@@ -54,13 +54,13 @@ namespace BlackBarberAPI.Process
                 respuesta.Descripcion = "El día seleccionado no es hábil para agendar citas.";
                 return respuesta;
             }
-            if(!diaHabil.Habil)
+            if (!diaHabil.Habil)
             {
                 respuesta.Estatus = false;
                 respuesta.Descripcion = "El día seleccionado no es hábil para agendar citas.";
                 return respuesta;
             }
-            if(diaHabil.HoraFin<citaCreacionDTO.FechaTermino.TimeOfDay || diaHabil.HoraInicio > citaCreacionDTO.FechaInicio.TimeOfDay)
+            if (diaHabil.HoraFin < citaCreacionDTO.FechaTermino.TimeOfDay || diaHabil.HoraInicio > citaCreacionDTO.FechaInicio.TimeOfDay)
             {
                 respuesta.Estatus = false;
                 respuesta.Descripcion = "El horario seleccionado no es válido para agendar citas.";
@@ -77,7 +77,7 @@ namespace BlackBarberAPI.Process
             try
             {
                 var citaCreada = await _citaService.CrearYObtener(cita);
-                if (citaCreada.Id <= 0){
+                if (citaCreada.Id <= 0) {
                     throw new Exception("No se pudo crear la cita.");
                 }
                 foreach (var servicio in citaCreacionDTO.Servicios)
@@ -105,7 +105,7 @@ namespace BlackBarberAPI.Process
                 respuesta.Descripcion = "Cita creada exitosamente.";
                 return respuesta;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 await transaccion.RollbackAsync();
                 respuesta.Estatus = false;
@@ -158,6 +158,13 @@ namespace BlackBarberAPI.Process
         public async Task<List<CitaDTO>> ObtenerCitasAyer()
         {
             var citas = await _citaService.ObtenerCitasAyer();
+            return citas;
+        }
+
+        public async Task<List<CitaDTO>> ObtenerCitasXCliente(int idCLiente)
+        {
+            var citas = await _citaService.ObtenerCitasVigentes();
+            citas = citas.Where(c => c.IdCliente == idCLiente).ToList();
             return citas;
         }
     }

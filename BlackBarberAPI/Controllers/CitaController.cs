@@ -1,7 +1,8 @@
 ﻿using BlackBarberAPI.DTOs;
+using BlackBarberAPI.Process;
 using Microsoft.AspNetCore.Mvc;
 
-namespace BlackBarberAPI.Process
+namespace BlackBarberAPI.Controllers
 {
     [Route("api/cita")]
     [ApiController]

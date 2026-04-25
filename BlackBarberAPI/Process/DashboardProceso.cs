@@ -77,6 +77,12 @@ namespace BlackBarberAPI.Process
             return dashboard;
         }
 
-
+        public async Task<DashboardClienteDTO> ObtenerDashboardCliente(int IdCliente)
+        {
+            DashboardClienteDTO dashboard = new DashboardClienteDTO();
+            var citas = await _citaProceso.ObtenerCitasXCliente(IdCliente);
+            dashboard.Reservas = citas.Count();
+            return dashboard;
+        }
     }
 }
