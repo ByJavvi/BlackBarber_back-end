@@ -61,6 +61,22 @@ namespace BlackBarberAPI.Process
             return dashboard;
         }
 
+        public async Task<DashboardBarberoDTO> ObtenerDashboardBarbero(int idBarbero)
+        {
+            DashboardBarberoDTO dashboard = new DashboardBarberoDTO();
+            var citas = await _citaProceso.ObtenerCitasXBarbero(idBarbero);
+            var citasHoy = citas.Where(c => DateOnly.FromDateTime(c.FechaInicio.Date) == DateOnly.FromDateTime(DateTime.Now)).ToList();
+            dashboard.CitasDeldia = citasHoy.Count();
+            dashboard.CitasEnCurso = citasHoy.Where(c => c.Estatus == 2).Count();
+            dashboard.CitasPorAtender = citasHoy.Where(c => c.Estatus == 1).Count();
+            var proximaCita = citasHoy.Where(c => c.Estatus == 1).OrderBy(c => c.FechaInicio).FirstOrDefault();
+            dashboard.ProximaCita = proximaCita != null ? proximaCita.FechaInicio.ToString("g") : "No hay próximas citas";
+            dashboard.CitasAtendidas = citasHoy.Where(c => c.Estatus == 3).Count();
+            dashboard.CalidadRitmo = dashboard.CitasAtendidas > 5 ? "Excelente" : dashboard.CitasAtendidas > 2 ? "Buen ritmo de trabajo" : "Ya mejorará";
+            //Falta la disponiblilidad
+            return dashboard;
+        }
+
 
     }
 }
