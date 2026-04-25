@@ -204,7 +204,6 @@ public partial class BlackBarberContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PK__Servicio__3214EC07A1BF930E");
 
-            entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.Precio).HasColumnType("decimal(10, 2)");
 
             entity.HasOne(d => d.IdCitaNavigation).WithMany(p => p.ServicioCita)
@@ -214,6 +213,9 @@ public partial class BlackBarberContext : DbContext
             entity.HasOne(d => d.IdServicioNavigation).WithMany(p => p.ServicioCita)
                 .HasForeignKey(d => d.IdServicio)
                 .HasConstraintName("FK_ServicioCita_Servicio");
+
+            entity.HasOne(d => d.IdBarberoNavigation).WithMany(p => p.ServiciosCitas)
+                .HasForeignKey(p => p.IdBarbero);
         });
 
         modelBuilder.Entity<TipoServicio>(entity =>

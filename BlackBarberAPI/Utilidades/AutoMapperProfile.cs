@@ -70,6 +70,13 @@ namespace BlackBarberAPI.Utilidades
                 .ForMember(destino => destino.ServicioCita, opt => opt.Ignore())
                 .ForMember(destino => destino.IdTipoNavigation, opt => opt.Ignore());
 
+            CreateMap<ServicioCitum, ServicioCitaDTO>();
+            CreateMap<ServicioCitaDTO, ServicioCitum>()
+                .ForMember(destino => destino.IdServicioNavigation, opt => opt.Ignore())
+                .ForMember(destino => destino.IdBarberoNavigation, opt => opt.Ignore())
+                .ForMember(destino => destino.IdCitaNavigation, opt => opt.Ignore())
+                .ForMember(destino => destino.DetalleCita, opt => opt.Ignore());
+
             #endregion
 
             #region Consulta
