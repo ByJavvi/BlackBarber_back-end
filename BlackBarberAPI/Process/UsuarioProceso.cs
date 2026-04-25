@@ -226,6 +226,8 @@ namespace BlackBarberAPI.Process
                 Token = resultadoToken.Token
             };
             await _emailService.EnviarEmail(emailDTO);
+            respuesta.Estatus = true;
+            respuesta.Descripcion = "Se ha enviado un correo con las instrucciones para restablecer tu contraseña.";
             return respuesta;
         }
 

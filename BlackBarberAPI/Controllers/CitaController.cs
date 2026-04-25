@@ -28,5 +28,12 @@ namespace BlackBarberAPI.Controllers
             var lista = await _proceso.ObtenerCitasXBarbero(idBarbero);
             return lista;
         }
+
+        [HttpGet("obtenerListadoDetalladoXUsuario/{idUsuario:int}")]
+        public async Task<ActionResult<List<CitaDetalladaDTO>>> ObtenerListadoDetalladoXUsuario(int idUsuario)
+        {
+            var lista = await _proceso.ObtenerListadoDetalladoXUsuario(idUsuario);
+            return lista;
+        }
     }
 }

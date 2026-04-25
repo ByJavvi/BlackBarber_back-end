@@ -12,6 +12,8 @@ namespace BlackBarberAPI.Process
         private readonly IDetalleCitaService<BlackBarberContext> _detalleCitaService;
         private readonly IBarberoService<BlackBarberContext> _barberoService;
         private readonly IDiasHabilesService<BlackBarberContext> _habilesService;
+        private readonly IServicioService<BlackBarberContext> _servicioService;
+        private readonly IUsuarioService<BlackBarberContext> _usuarioService;
         private readonly BlackBarberContext _dbContext;
 
         public CitaProceso(ICitaService<BlackBarberContext> citaService
@@ -19,6 +21,8 @@ namespace BlackBarberAPI.Process
             , IDetalleCitaService<BlackBarberContext> detalleCitaService
             , IBarberoService<BlackBarberContext> barberoService
             , IDiasHabilesService<BlackBarberContext> habilesService
+            , IServicioService<BlackBarberContext> servicioService
+            , IUsuarioService<BlackBarberContext> usuarioService
             , BlackBarberContext dbContext
             )
         {
@@ -27,6 +31,8 @@ namespace BlackBarberAPI.Process
             _detalleCitaService = detalleCitaService;
             _barberoService = barberoService;
             _habilesService = habilesService;
+            _servicioService = servicioService;
+            _usuarioService = usuarioService;
             _dbContext = dbContext;
         }
 
@@ -47,7 +53,7 @@ namespace BlackBarberAPI.Process
             }
             var diasHabiles = await _habilesService.ObtenerTodos();
             var diaCita = (int)citaCreacionDTO.FechaInicio.DayOfWeek;
-            var diaHabil = diasHabiles.FirstOrDefault(d => d.Id == diaCita);
+            var diaHabil = diasHabiles.FirstOrDefault(d => d.Id == diaCita-1);
             if (diaHabil == null)
             {
                 respuesta.Estatus = false;
@@ -166,6 +172,47 @@ namespace BlackBarberAPI.Process
             var citas = await _citaService.ObtenerCitasVigentes();
             citas = citas.Where(c => c.IdCliente == idCLiente).ToList();
             return citas;
+        }
+
+        public async Task<List<CitaDetalladaDTO>> ObtenerListadoDetalladoXUsuario(int idUsuario)
+        {
+            List<CitaDetalladaDTO> listado = new List<CitaDetalladaDTO>();
+            var citas = await ObtenerCitasXCliente(idUsuario);
+            var servicios = await _servicioService.ObtenerTodos();
+            var usuario = await _usuarioService.ObtenerXId(idUsuario);
+            foreach (var cita in citas)
+            {
+                var citaDetallada = new CitaDetalladaDTO
+                {
+                    Id = cita.Id,
+                    FechaInicio = cita.FechaInicio,
+                    FechaTermino = cita.FechaTermino,
+                    IdCliente = cita.IdCliente,
+                    Estatus = cita.Estatus,
+                    NombreCliente = usuario.Username,
+                    EstatusDescripcion = cita.Estatus == 1 ? "Agendada" : cita.Estatus == 2 ? "En curso" : cita.Estatus == 3 ? "Completada" : "Cancelada",
+                };
+                var serviciosCita = await _servicioCita_service.ObtenerXPerteneciente(cita.Id);
+                foreach (var servicio in serviciosCita)
+                {
+                    var servicioObjeto = servicios.FirstOrDefault(s => s.Id == servicio.IdServicio);
+                    var barberoRelacionado = await _barberoService.ObtenerXId((int)servicio.IdBarbero);
+                    ServicioCitaDetalladoDTO servicioDetallado = new ServicioCitaDetalladoDTO
+                    {
+                        Id = servicio.Id,
+                        IdCita = servicio.IdCita,
+                        IdBarbero = servicio.IdBarbero,
+                        IdServicio = servicio.IdServicio,
+                        Precio = servicio.Precio,
+                        NombreBarbero = barberoRelacionado.Nombre,
+                        NombreServicio = servicioObjeto != null ? servicioObjeto.Nombre : "Servicio no encontrado"
+                    };
+                    citaDetallada.Servicios.Add(servicioDetallado);
+                }
+                citaDetallada.Total = citaDetallada.Servicios.Sum(s => s.Precio);
+                listado.Add(citaDetallada);
+            }
+            return listado;
         }
     }
 }

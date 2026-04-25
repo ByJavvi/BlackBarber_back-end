@@ -17,4 +17,12 @@
     {
         public List<ServicioCitaDTO> Servicios { get; set; } = new List<ServicioCitaDTO>();
     }
+
+    public class CitaDetalladaDTO : CitaDTO
+    {
+        public string NombreCliente { get; set; } = "";
+        public string EstatusDescripcion { get; set; } = "";
+        public decimal Total { get; set; }
+        public List<ServicioCitaDetalladoDTO> Servicios { get; set; } = new List<ServicioCitaDetalladoDTO>();
+    }
 }

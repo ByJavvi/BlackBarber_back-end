@@ -12,4 +12,10 @@
 
         public decimal Precio { get; set; }
     }
+
+    public class ServicioCitaDetalladoDTO : ServicioCitaDTO
+    {
+        public string NombreBarbero { get; set; }
+        public string NombreServicio { get; set; }
+    }
 }
