@@ -17,12 +17,13 @@ namespace BlackBarberAPI.Process
         private readonly PasswordEncrtyption _passwordEncryption;
         private readonly IBarberoService<BlackBarberContext> _barberoService;
         private readonly IConfiguration _configuration;
-
+        private readonly IEmailService _emailService;
         public UsuarioProceso(IUsuarioService<BlackBarberContext> usuarioService, 
             PasswordEncrtyption passwordEncrtyption, 
             IRolService<BlackBarberContext> rolService, 
             IBarberoService<BlackBarberContext> barberoService,
-            IConfiguration configuration
+            IConfiguration configuration,
+            IEmailService emailService
             )
         {
             _usuarioService = usuarioService;
@@ -30,6 +31,7 @@ namespace BlackBarberAPI.Process
             _rolService = rolService;
             _barberoService = barberoService;
             _configuration = configuration;
+            _emailService = emailService;
         }
 
         public async Task<RespuestaDTO> CrearUsuario(UsuarioCreacionDTO usuario)
@@ -190,12 +192,12 @@ namespace BlackBarberAPI.Process
             return respuesta;
         }
 
-        public async Task<RespuestaAutenticacionDTO> ConstruirTokenRecuperacion(UsuarioDTO usuario)
+        public async Task<RespuestaAutenticacionDTO> ConstruirTokenRecuperacion(string correo)
         {
             RespuestaAutenticacionDTO respuesta = new RespuestaAutenticacionDTO();
             var zvClaims = new List<Claim>()
             {
-                new Claim("email", usuario.Correo),
+                new Claim("email", correo),
             };
             var zvLlave = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["llavejwt"]!));
             var zvCreds = new SigningCredentials(zvLlave, SecurityAlgorithms.HmacSha256);
@@ -203,6 +205,27 @@ namespace BlackBarberAPI.Process
             var zvToken = new JwtSecurityToken(issuer: null, audience: null, claims: zvClaims, expires: zvExpiracion, signingCredentials: zvCreds);
             respuesta.Token = new JwtSecurityTokenHandler().WriteToken(zvToken);
             respuesta.Estatus = true;
+            return respuesta;
+        }
+
+        public async Task<RespuestaDTO> EnviarCorreoRecuperacion(string Correo)
+        {
+            RespuestaDTO respuesta = new RespuestaDTO();
+            var usuario = await _usuarioService.ObtenerXCorreo(Correo);
+            if(usuario == null || usuario.Id <= 0)
+            {
+                respuesta.Estatus = false;
+                respuesta.Descripcion = "No se encontró un usuario registrado con ese correo.";
+                return respuesta;
+            }
+            var resultadoToken = await ConstruirTokenRecuperacion(Correo);
+            var emailDTO = new EmailDTO
+            {
+                To = Correo,
+                Subject = "Recuperación de contraseña - BlackBarber",
+                Token = resultadoToken.Token
+            };
+            await _emailService.EnviarEmail(emailDTO);
             return respuesta;
         }
 
@@ -243,7 +266,34 @@ namespace BlackBarberAPI.Process
                 respuesta.Descripcion = "Token inválido o expirado.";
                 return respuesta;
             }
-            //Work in progress...
+            var handler = new JwtSecurityTokenHandler();
+            if(!handler.CanReadToken(objeto.Token))
+            {
+                respuesta.Estatus = false;
+                respuesta.Descripcion = "Token inválido o expirado.";
+                return respuesta;
+            }
+            var jwtToken = handler.ReadJwtToken(objeto.Token);
+
+            // El email suele venir en el claim 'email' o 'sub' (Subject)
+            var emailClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == "email")?.Value;
+            if(emailClaim == null)
+            {
+                respuesta.Estatus = false;
+                respuesta.Descripcion = "Token inválido: no contiene el correo electrónico.";
+                return respuesta;
+            }
+
+            if(emailClaim != usuario.Correo)
+            {
+                respuesta.Estatus = false;
+                respuesta.Descripcion = "Token inválido: el correo electrónico no coincide.";
+                return respuesta;
+            }
+
+            usuario.PasswordHash = _passwordEncryption.HashPassword(objeto.Contrasena);
+            respuesta = await _usuarioService.Editar(usuario);
+
             return respuesta;
         }
     }

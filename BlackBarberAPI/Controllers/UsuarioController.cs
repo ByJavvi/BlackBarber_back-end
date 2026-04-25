@@ -42,5 +42,20 @@ namespace BlackBarberAPI.Controllers
             var lista = await _proceso.ObtenerListadoUsuarios();
             return lista;
         }
+
+        public record CorreoDTO(string email);
+        [HttpPost("enviarEmailRecuperacion")]
+        public async Task<ActionResult<RespuestaDTO>> EnviarEmailRecuperacion([FromBody] CorreoDTO correo)
+        {
+            var resultado = await _proceso.EnviarCorreoRecuperacion(correo.email);
+            return resultado;
+        }
+
+        [HttpPost("restablecerPassword")]
+        public async Task<ActionResult<RespuestaDTO>> RestablecerPassword([FromBody] RestablecerContrasenaDTO credenciales)
+        {
+            var resultado = await _proceso.RestablecerContrasena(credenciales);
+            return resultado;
+        }
     }
 }

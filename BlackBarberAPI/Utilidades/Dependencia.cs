@@ -28,6 +28,7 @@ namespace BlackBarberAPI.Utilidades
             services.AddScoped(typeof(ITipoServicioService<>), typeof(TipoServicioService<>));
             services.AddScoped(typeof(IDiasHabilesService<>), typeof(DiashabiliesService<>));
             services.AddScoped(typeof(IConsultaService<>), typeof(ConsultaService<>));
+            services.AddScoped<IEmailService, EmailService>();
 
             #endregion
 
