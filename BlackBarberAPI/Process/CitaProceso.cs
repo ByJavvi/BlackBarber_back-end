@@ -53,7 +53,7 @@ namespace BlackBarberAPI.Process
             }
             var diasHabiles = await _habilesService.ObtenerTodos();
             var diaCita = (int)citaCreacionDTO.FechaInicio.DayOfWeek;
-            var diaHabil = diasHabiles.FirstOrDefault(d => d.Id == diaCita-1);
+            var diaHabil = diasHabiles.FirstOrDefault(d => d.Id == diaCita);
             if (diaHabil == null)
             {
                 respuesta.Estatus = false;
