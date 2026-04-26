@@ -18,9 +18,11 @@ builder.Services.AddDbContext<BlackBarberContext>(options =>
 builder.Services.InyectarDependencias(builder.Configuration);
 
 //Configura los CORS y otros servicios
-var origenesPermitidos = builder.Configuration.GetValue<string>("OrigenesPermitidos")!.Split(",", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-if (origenesPermitidos.Length == 0)
+var origenesConfig = builder.Configuration["OrigenesPermitidos"];
+if (string.IsNullOrEmpty(origenesConfig))
     throw new InvalidOperationException("Falta 'OrigenesPermitidos' en configuración.");
+
+var origenesPermitidos = origenesConfig.Split(",", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
 builder.Services.AddCors(zOptions =>
 {
@@ -58,7 +60,7 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 app.UseCors();
 app.UseAuthorization();
 app.MapControllers();
