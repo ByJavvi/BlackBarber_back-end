@@ -256,18 +256,18 @@ namespace BlackBarberAPI.Process
                 return respuesta;
             }
 
-            string decodedToken;
-            try
-            {
-                var tokenBytes = WebEncoders.Base64UrlDecode(objeto.Token);
-                decodedToken = Encoding.UTF8.GetString(tokenBytes);
-            }
-            catch
-            {
-                respuesta.Estatus = false;
-                respuesta.Descripcion = "Token inválido o expirado.";
-                return respuesta;
-            }
+            //string decodedToken;
+            //try
+            //{
+            //    var tokenBytes = WebEncoders.Base64UrlDecode(objeto.Token);
+            //    decodedToken = Encoding.UTF8.GetString(tokenBytes);
+            //}
+            //catch
+            //{
+            //    respuesta.Estatus = false;
+            //    respuesta.Descripcion = "Token inválido o expirado.";
+            //    return respuesta;
+            //}
             var handler = new JwtSecurityTokenHandler();
             if(!handler.CanReadToken(objeto.Token))
             {

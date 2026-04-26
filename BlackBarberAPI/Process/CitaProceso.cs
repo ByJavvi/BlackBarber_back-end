@@ -88,7 +88,11 @@ namespace BlackBarberAPI.Process
                 }
                 foreach (var servicio in citaCreacionDTO.Servicios)
                 {
-                    var servicioObjeto = await _servicioService.ObtenerXId(servicio.Id);
+                    var servicioObjeto = await _servicioService.ObtenerXId((int)servicio.IdServicio);
+                    if(servicioObjeto == null)
+                    {
+                        throw new Exception($"El servicio con ID {servicio.IdServicio} no existe.");
+                    }
                     var disponibilidad = await ObtenerDisponibilidad(cita.FechaInicio, cita.FechaTermino, (int)servicio.IdBarbero);
                     if (!disponibilidad.Estatus)
                     {
@@ -207,6 +211,47 @@ namespace BlackBarberAPI.Process
                         IdServicio = servicio.IdServicio,
                         Precio = servicio.Precio,
                         NombreBarbero = barberoRelacionado.Nombre,
+                        NombreServicio = servicioObjeto != null ? servicioObjeto.Nombre : "Servicio no encontrado"
+                    };
+                    citaDetallada.Servicios.Add(servicioDetallado);
+                }
+                citaDetallada.Total = citaDetallada.Servicios.Sum(s => s.Precio);
+                listado.Add(citaDetallada);
+            }
+            return listado;
+        }
+
+        public async Task<List<CitaDetalladaDTO>> ObtenerListadoDetalladoXBarbero(int idBarbero)
+        {
+            List<CitaDetalladaDTO> listado = new List<CitaDetalladaDTO>();
+            var citas = await ObtenerCitasXBarbero(idBarbero);
+            var servicios = await _servicioService.ObtenerTodos();
+            var barbero = await _barberoService.ObtenerXId(idBarbero);
+            foreach (var cita in citas)
+            {
+                var cliente = await _usuarioService.ObtenerXId((int)cita.IdCliente);
+                var citaDetallada = new CitaDetalladaDTO
+                {
+                    Id = cita.Id,
+                    FechaInicio = cita.FechaInicio,
+                    FechaTermino = cita.FechaTermino,
+                    IdCliente = cita.IdCliente,
+                    Estatus = cita.Estatus,
+                    NombreCliente = cliente!=null?cliente.Username:"Desconocido",
+                    EstatusDescripcion = cita.Estatus == 1 ? "Agendada" : cita.Estatus == 2 ? "En curso" : cita.Estatus == 3 ? "Completada" : "Cancelada",
+                };
+                var serviciosCita = await _servicioCita_service.ObtenerXPerteneciente(cita.Id);
+                foreach (var servicio in serviciosCita)
+                {
+                    var servicioObjeto = servicios.FirstOrDefault(s => s.Id == servicio.IdServicio);
+                    ServicioCitaDetalladoDTO servicioDetallado = new ServicioCitaDetalladoDTO
+                    {
+                        Id = servicio.Id,
+                        IdCita = servicio.IdCita,
+                        IdBarbero = servicio.IdBarbero,
+                        IdServicio = servicio.IdServicio,
+                        Precio = servicio.Precio,
+                        NombreBarbero = barbero.Nombre,
                         NombreServicio = servicioObjeto != null ? servicioObjeto.Nombre : "Servicio no encontrado"
                     };
                     citaDetallada.Servicios.Add(servicioDetallado);
