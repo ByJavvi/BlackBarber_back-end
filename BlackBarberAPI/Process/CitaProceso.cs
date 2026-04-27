@@ -221,12 +221,18 @@ namespace BlackBarberAPI.Process
             return listado;
         }
 
-        public async Task<List<CitaDetalladaDTO>> ObtenerListadoDetalladoXBarbero(int idBarbero)
+        public async Task<List<CitaDetalladaDTO>> ObtenerListadoDetalladoXBarbero(int idUsuarioBarbero)
         {
             List<CitaDetalladaDTO> listado = new List<CitaDetalladaDTO>();
+            var barbero = await _barberoService.ObtenerXIdUsuario(idUsuarioBarbero);
+            if (barbero.Id <= 0)
+            {
+                return listado;
+            }
+            int idBarbero = barbero.Id;
             var citas = await ObtenerCitasXBarbero(idBarbero);
             var servicios = await _servicioService.ObtenerTodos();
-            var barbero = await _barberoService.ObtenerXId(idBarbero);
+            //var barbero = await _barberoService.ObtenerXId(idBarbero);
             foreach (var cita in citas)
             {
                 var cliente = await _usuarioService.ObtenerXId((int)cita.IdCliente);
