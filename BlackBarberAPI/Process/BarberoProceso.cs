@@ -8,11 +8,13 @@ namespace BlackBarberAPI.Process
     {
         private readonly IBarberoService<BlackBarberContext> _barberoService;
         private readonly IUsuarioService<BlackBarberContext> _usuarioService;
+        private readonly CitaProceso _citaProceso;
 
-        public BarberoProceso(IBarberoService<BlackBarberContext> barberoContext, IUsuarioService<BlackBarberContext> usuarioService)
+        public BarberoProceso(IBarberoService<BlackBarberContext> barberoContext, IUsuarioService<BlackBarberContext> usuarioService, CitaProceso citaProceso)
         {
             _barberoService = barberoContext;
             _usuarioService = usuarioService;
+            _citaProceso = citaProceso;
         }
 
         public async Task<List<BarberoListadoDTO>> ObtenerBarberos()
@@ -73,7 +75,16 @@ namespace BlackBarberAPI.Process
                 return new RespuestaDTO
                 {
                     Estatus = false,
-                    Descripcion = "El barbero no existe"
+                    Descripcion = "El barbero no existe."
+                };
+            }
+            var citas = await _citaProceso.ObtenerCitasXBarbero(id);
+            if (citas.Count() > 0)
+            {
+                return new RespuestaDTO
+                {
+                    Estatus = false,
+                    Descripcion = "No se puede eliminar el barbero si ya se le han asignado citas."
                 };
             }
             var eliminado = await _barberoService.Eliminar(id);
@@ -82,7 +93,7 @@ namespace BlackBarberAPI.Process
                 var usuario = await _usuarioService.ObtenerXId((int)barbero.IdUsuario);
                 if (usuario.Id > 0)
                 {
-                    usuario.IdRol = 3; // Asignar rol de cliente
+                    usuario.IdRol = 2; // Asignar rol de cliente
                     await _usuarioService.Editar(usuario);
                 }
             }
@@ -106,7 +117,7 @@ namespace BlackBarberAPI.Process
                 var usuarioAnterior = await _usuarioService.ObtenerXId((int)barbero.IdUsuario);
                 if (usuarioAnterior.Id > 0)
                 {
-                    usuarioAnterior.IdRol = 3; // Asignar rol de cliente
+                    usuarioAnterior.IdRol = 2; // Asignar rol de cliente
                     await _usuarioService.Editar(usuarioAnterior);
                 }
             }
@@ -114,7 +125,7 @@ namespace BlackBarberAPI.Process
             var respuesta = await _barberoService.Editar(barbero);
             if (respuesta.Estatus)
             {
-                usuario.IdRol = 2; // Asignar rol de barbero
+                usuario.IdRol = 3; // Asignar rol de barbero
                 await _usuarioService.Editar(usuario);
             }
             return respuesta;

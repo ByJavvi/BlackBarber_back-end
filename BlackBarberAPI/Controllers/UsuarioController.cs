@@ -57,5 +57,19 @@ namespace BlackBarberAPI.Controllers
             var resultado = await _proceso.RestablecerContrasena(credenciales);
             return resultado;
         }
+
+        [HttpPost("obtenerDisponibilidadXUsername")]
+        public async Task<ActionResult<RespuestaDTO>> ObtenerDisponibilidadUsername(string username)
+        {
+            var resultado = await _proceso.ObtenerDisponibilidadNombreUsuario(username);
+            return resultado;
+        }
+
+        [HttpPost("obtenerDisponibilidadXCorreo")]
+        public async Task<ActionResult<RespuestaDTO>> ObtenerDisponibilidadCorreo(string correo)
+        {
+            var resultado = await _proceso.ObtenerDisponibilidadCorreo(correo);
+            return resultado;
+        }
     }
 }

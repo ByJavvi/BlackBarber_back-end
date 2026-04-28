@@ -8,11 +8,13 @@ namespace BlackBarberAPI.Process
     {
         private readonly IServicioService<BlackBarberContext> _servicioService;
         private readonly IAnadidoServicioService<BlackBarberContext> _anadidoServicioService;
+        private readonly IServicioCitaService<BlackBarberContext> _servicioCitaService;
 
-        public ServicioProceso(IServicioService<BlackBarberContext> servicioService, IAnadidoServicioService<BlackBarberContext> anadidoServicioService)
+        public ServicioProceso(IServicioService<BlackBarberContext> servicioService, IAnadidoServicioService<BlackBarberContext> anadidoServicioService, IServicioCitaService<BlackBarberContext> servicioCitaService)
         {
             _servicioService = servicioService;
             _anadidoServicioService = anadidoServicioService;
+            _servicioCitaService = servicioCitaService;
         }
 
         public async Task<List<ServicioDTO>> ObtenerTodosServicios()
@@ -65,13 +67,21 @@ namespace BlackBarberAPI.Process
         public async Task<RespuestaDTO> EliminarServicio(int id)
         {
             var anadidosServicio = await _anadidoServicioService.ObtenerXPerteneciente(id);
+            var relacionServicio = await _servicioCitaService.ObtenerXIdServicio(id);
+            if(relacionServicio.Count() > 0)
+            {
+                return new RespuestaDTO
+                {
+                    Estatus = false,
+                    Descripcion = "No se puede eliminar el servicio cuando ya hay citas que lo consumen"
+                };
+            }
             foreach (var anadido in anadidosServicio)
             {
                 await _anadidoServicioService.Eliminar(anadido.Id);
             }
             var respuesta = await _servicioService.Eliminar(id);
             return respuesta;
-            //Falta validar que el servicio no esté siendo utilizado en alguna cita, si es así, no se podrá eliminar y se deberá informar al usuario.
         }
 
         public async Task<List<AnadidoServicioDTO>> ObtenerAnadidosXPerteneciente(int idServicio)
