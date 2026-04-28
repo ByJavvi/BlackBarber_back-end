@@ -298,5 +298,26 @@ namespace BlackBarberAPI.Process
 
             return respuesta;
         }
+
+        public async Task<RespuestaDTO> ObtenerDisponibilidadNombreUsuario(string nombreUsuario)
+        {
+            var usuarios = await _usuarioService.ObtenerTodos();
+            var usuario = usuarios.FirstOrDefault(u=>u.Username == nombreUsuario);
+            if(usuario == null || usuario.Id <= 0)
+            {
+                return new RespuestaDTO { Estatus = true, Descripcion = "El nombre de usuario está disponible." };
+            }
+            return new RespuestaDTO { Estatus = false, Descripcion = "El nombre de usuario ya está ocupado." };
+        }
+
+        public async Task<RespuestaDTO> ObtenerDisponibilidadCorreo(string correo)
+        {
+            var usuario = await _usuarioService.ObtenerXCorreo(correo);
+            if (usuario == null || usuario.Id <= 0)
+            {
+                return new RespuestaDTO { Estatus = true, Descripcion = "El correo electrónico está disponible." };
+            }
+            return new RespuestaDTO { Estatus = false, Descripcion = "El correo electrónico ya está ocupado." };
+        }
     }
 }

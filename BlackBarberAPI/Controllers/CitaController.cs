@@ -42,5 +42,12 @@ namespace BlackBarberAPI.Controllers
             var lista = await _proceso.ObtenerListadoDetalladoXBarbero(idBarbero);
             return lista;
         }
+
+        [HttpPost("obtenerDisponibilidadXBarbero")]
+        public async Task<ActionResult<RespuestaDTO>> ObtenerDisponibilidadBarbero(HoraBarberoDTO parametros)
+        {
+            var respuesta = await _proceso.ObtenerDisponibilidad(parametros.HoraInicio, parametros.HoraFin, parametros.IdBarbero);
+            return respuesta;
+        }
     }
 }
